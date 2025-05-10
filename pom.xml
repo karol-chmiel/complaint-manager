@@ -28,6 +28,7 @@
     </scm>
     <properties>
         <java.version>24</java.version>
+        <nv-i18n.version>1.29</nv-i18n.version>
     </properties>
     <dependencies>
         <dependency>
@@ -42,6 +43,11 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.neovisionaries</groupId>
+            <artifactId>nv-i18n</artifactId>
+            <version>${nv-i18n.version}</version>
         </dependency>
 
         <dependency>
