@@ -30,6 +30,8 @@
         <java.version>24</java.version>
         <nv-i18n.version>1.29</nv-i18n.version>
         <liquibase.version>4.31.1</liquibase.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
+        <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
     </properties>
     <dependencies>
         <dependency>
@@ -55,6 +57,11 @@
             <artifactId>liquibase-core</artifactId>
             <version>${liquibase.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -68,6 +75,20 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
             </plugin>
         </plugins>
     </build>
