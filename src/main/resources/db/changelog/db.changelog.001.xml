@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="001-add-complaint-table" author="karol-chmiel">
+        <createTable tableName="COMPLAINT">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="PRODUCT_ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CONTENT" type="VARCHAR(1000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CREATION_DATE" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="COMPLAINANT" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="COMPLAINANT_COUNTRY" type="CHAR(2)"/>
+            <column name="COUNT" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="add-uniqueness-constraint-complaint" author="karol-chmiel">
+        <addUniqueConstraint
+                columnNames="PRODUCT_ID, COMPLAINANT"
+                constraintName="UNIQUENESS_CONSTRAINT"
+                tableName="COMPLAINT"/>
+    </changeSet>
+</databaseChangeLog>

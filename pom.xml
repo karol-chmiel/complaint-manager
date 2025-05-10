@@ -29,6 +29,7 @@
     <properties>
         <java.version>24</java.version>
         <nv-i18n.version>1.29</nv-i18n.version>
+        <liquibase.version>4.31.1</liquibase.version>
     </properties>
     <dependencies>
         <dependency>
@@ -48,6 +49,11 @@
             <groupId>com.neovisionaries</groupId>
             <artifactId>nv-i18n</artifactId>
             <version>${nv-i18n.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>${liquibase.version}</version>
         </dependency>
 
         <dependency>
