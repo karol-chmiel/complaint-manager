@@ -89,4 +89,9 @@ public class Complaint {
     public void setCount(Integer count) {
         this.count = count;
     }
+
+    public Complaint incrementCount() {
+        this.count++;
+        return this;
+    }
 }

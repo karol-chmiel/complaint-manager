@@ -1,9 +1,6 @@
 package dev.karolchmiel.complaintmanager.service;
 
-import com.neovisionaries.i18n.CountryCode;
-import dev.karolchmiel.complaintmanager.api.dto.ComplaintRetrievalDto;
 import dev.karolchmiel.complaintmanager.mapper.ComplaintMapper;
-import dev.karolchmiel.complaintmanager.model.Complaint;
 import dev.karolchmiel.complaintmanager.repository.ComplaintRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -13,7 +10,6 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,37 +65,4 @@ class ComplaintReadServiceTest {
             assertThat(result).hasSize(1).containsOnly(TEST_DATA.buildDto());
         }
     }
-
-    private record ComplaintTestData(long id, long productId, String content, String complainant,
-                                     LocalDateTime creationDate, CountryCode countryCode, int count) {
-        private static ComplaintTestData defaultData() {
-                return new ComplaintTestData(
-                        COMPLAINT_ID,
-                        123L,
-                        "Content",
-                        "user-123",
-                        LocalDateTime.now(),
-                        CountryCode.US,
-                        1
-                );
-            }
-
-            private Complaint buildEntity() {
-                final var complaint = new Complaint();
-                complaint.setId(id);
-                complaint.setProductId(productId);
-                complaint.setContent(content);
-                complaint.setCreationDate(creationDate);
-                complaint.setComplainant(complainant);
-                complaint.setComplainantCountry(countryCode);
-                complaint.setCount(count);
-                return complaint;
-            }
-
-            private ComplaintRetrievalDto buildDto() {
-                return new ComplaintRetrievalDto(
-                        id, productId, content, creationDate, complainant, countryCode, count
-                );
-            }
-        }
 }
