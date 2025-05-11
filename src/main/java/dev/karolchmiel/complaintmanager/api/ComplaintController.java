@@ -7,7 +7,7 @@ import dev.karolchmiel.complaintmanager.service.ComplaintReadService;
 import dev.karolchmiel.complaintmanager.service.ComplaintWriteService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -17,8 +17,7 @@ import static dev.karolchmiel.complaintmanager.util.HttpUtils.getClientIpAddress
 
 
 @RestController
-@RequestMapping("/complaints")
-public class ComplaintController {
+public class ComplaintController implements ComplaintApi {
     private final ComplaintReadService complaintReadService;
     private final ComplaintWriteService complaintWriteService;
 
@@ -27,20 +26,20 @@ public class ComplaintController {
         this.complaintWriteService = complaintWriteService;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ComplaintRetrievalDto> getComplaint(@PathVariable int id) {
+    @Override
+    public ResponseEntity<ComplaintRetrievalDto> getComplaint(int id) {
         return complaintReadService.getComplaintById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping
+    @Override
     public List<ComplaintRetrievalDto> getComplaints() {
         return complaintReadService.getAllComplaints();
     }
 
-    @PostMapping
-    public ResponseEntity<ComplaintRetrievalDto> createComplaint(@RequestBody ComplaintCreationDto dto,
+    @Override
+    public ResponseEntity<ComplaintRetrievalDto> createComplaint(ComplaintCreationDto dto,
                                                  HttpServletRequest request) {
         final var savedComplaint = complaintWriteService.addNewOrIncrementCount(dto, getClientIpAddress(request));
         if (savedComplaint.count() == 1) {
@@ -50,8 +49,8 @@ public class ComplaintController {
         return ResponseEntity.ok(savedComplaint);
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<Void> updateComplaint(@PathVariable long id, @RequestBody ComplaintUpdateDto dto) {
+    @Override
+    public ResponseEntity<Void> updateComplaint(long id, ComplaintUpdateDto dto) {
         final var updated = complaintWriteService.updateComplaint(id, dto);
         if (updated) {
             return ResponseEntity.noContent().build();
