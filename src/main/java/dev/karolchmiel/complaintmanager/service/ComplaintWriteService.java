@@ -2,6 +2,7 @@ package dev.karolchmiel.complaintmanager.service;
 
 import dev.karolchmiel.complaintmanager.api.dto.ComplaintCreationDto;
 import dev.karolchmiel.complaintmanager.api.dto.ComplaintRetrievalDto;
+import dev.karolchmiel.complaintmanager.api.dto.ComplaintUpdateDto;
 import dev.karolchmiel.complaintmanager.mapper.ComplaintMapper;
 import dev.karolchmiel.complaintmanager.model.Complaint;
 import dev.karolchmiel.complaintmanager.repository.ComplaintRepository;
@@ -42,6 +43,19 @@ public class ComplaintWriteService {
                 .orElseGet(() -> createNewComplaint(dto, remoteAddr));
         final var savedComplaint = complaintRepository.save(complaint);
         return complaintMapper.entityToRetrievalDto(savedComplaint);
+    }
+
+    /**
+     * Updates the content of an existing complaint based on its ID.
+     *
+     * @param complaintId the ID of the complaint to update
+     * @param dto the data transfer object containing the updated content for the complaint
+     * @return true if the complaint was successfully updated, false otherwise
+     */
+    @Transactional
+    public boolean updateComplaint(long complaintId, ComplaintUpdateDto dto) {
+        final var rowsUpdated = complaintRepository.updateComplaintContent(complaintId, dto.content());
+        return rowsUpdated > 0;
     }
 
     private Complaint createNewComplaint(ComplaintCreationDto dto, String remoteAddr) {

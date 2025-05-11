@@ -2,12 +2,15 @@ package dev.karolchmiel.complaintmanager.service;
 
 import com.neovisionaries.i18n.CountryCode;
 import dev.karolchmiel.complaintmanager.api.dto.ComplaintCreationDto;
+import dev.karolchmiel.complaintmanager.api.dto.ComplaintUpdateDto;
 import dev.karolchmiel.complaintmanager.mapper.ComplaintMapper;
 import dev.karolchmiel.complaintmanager.model.Complaint;
 import dev.karolchmiel.complaintmanager.repository.ComplaintRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mapstruct.factory.Mappers;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,7 +41,7 @@ class ComplaintWriteServiceTest {
     void setUp() {
         complaintWriteService = new ComplaintWriteService(complaintRepository, complaintMapper, ipGeolocationService);
 
-        when(complaintRepository.save(any(Complaint.class))).thenAnswer(invocation -> {
+        lenient().when(complaintRepository.save(any(Complaint.class))).thenAnswer(invocation -> {
             final Complaint savedComplaint = invocation.getArgument(0);
             savedComplaint.setId(TEST_DATA.id());
             return savedComplaint;
@@ -103,6 +106,22 @@ class ComplaintWriteServiceTest {
         assertThat(savedComplaint.getCount()).isEqualTo(2);
     }
 
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+            0, false
+            1, true
+            """)
+    void updateComplaint_shouldReturnTrueOnlyForExistingComplaints(int updatedRecords, boolean updateSuccessful) {
+        //given
+        final var newComplaintContent = "New content";
+        when(complaintRepository.updateComplaintContent(TEST_DATA.id(), newComplaintContent)).thenReturn(updatedRecords);
+
+        //when
+        final var updated = complaintWriteService.updateComplaint(TEST_DATA.id(), new ComplaintUpdateDto(newComplaintContent));
+
+        //then
+        assertThat(updated).isEqualTo(updateSuccessful);
+    }
 
     private Complaint verifySavedComplaint() {
         verify(complaintRepository).save(complaintCaptor.capture());
