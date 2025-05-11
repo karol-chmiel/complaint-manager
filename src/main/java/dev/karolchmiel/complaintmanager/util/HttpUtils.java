@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import static io.micrometer.common.util.StringUtils.isNotBlank;
 
 public class HttpUtils {
-    static final String X_FORWARDED_FOR = "X-Forwarded-For";
+    public static final String X_FORWARDED_FOR = "X-Forwarded-For";
 
     private HttpUtils() {
     }
