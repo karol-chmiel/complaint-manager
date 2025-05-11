@@ -3,6 +3,7 @@ package dev.karolchmiel.complaintmanager.api;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import dev.karolchmiel.complaintmanager.api.dto.ComplaintCreationDto;
 import dev.karolchmiel.complaintmanager.api.dto.ComplaintRetrievalDto;
 import dev.karolchmiel.complaintmanager.api.dto.ComplaintUpdateDto;
 import dev.karolchmiel.complaintmanager.service.ComplaintReadService;
@@ -46,7 +47,10 @@ class ComplaintControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new ComplaintController(complaintReadService, complaintWriteService)).build();
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(new ComplaintController(complaintReadService, complaintWriteService))
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
     }
@@ -66,7 +70,7 @@ class ComplaintControllerTest {
 
             //then
             final var actualDto = objectMapper.readValue(
-                    result.getResponse().getContentAsString(), 
+                    result.getResponse().getContentAsString(),
                     ComplaintRetrievalDto.class);
 
             assertThat(actualDto).isEqualTo(expectedDto);
@@ -130,7 +134,7 @@ class ComplaintControllerTest {
 
             //then
             final var actualDto = objectMapper.readValue(
-                    result.getResponse().getContentAsString(), 
+                    result.getResponse().getContentAsString(),
                     ComplaintRetrievalDto.class);
 
             assertThat(actualDto).isEqualTo(expectedDto);
@@ -156,6 +160,19 @@ class ComplaintControllerTest {
 
             //then
             assertThat(actualDto).isEqualTo(expectedDto);
+        }
+
+        @Test
+        void shouldReturnBadRequest_whenRequiredFieldsAreMissing() throws Exception {
+            //given
+            final var invalidDto = new ComplaintCreationDto(null, "", null);
+
+            //when/then
+            mockMvc.perform(postRequestWithClientIp(COMPLAINTS_ENDPOINT, invalidDto))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.productId").value("Product ID is required"))
+                    .andExpect(jsonPath("$.content").value("Content is required"))
+                    .andExpect(jsonPath("$.complainant").value("Complainant name is required"));
         }
     }
 

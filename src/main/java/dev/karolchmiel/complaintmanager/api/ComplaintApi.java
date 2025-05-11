@@ -11,10 +11,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -49,21 +51,27 @@ public interface ComplaintApi {
                             schema = @Schema(implementation = ComplaintRetrievalDto.class))),
             @ApiResponse(responseCode = "200", description = "Similar complaint found, count incremented",
                     content = @Content(mediaType = APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ComplaintRetrievalDto.class)))
+                            schema = @Schema(implementation = ComplaintRetrievalDto.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data",
+                    content = @Content(mediaType = APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = Map.class)))
     })
     @PostMapping
     ResponseEntity<ComplaintRetrievalDto> createComplaint(
             @Parameter(description = "Complaint information for creation", required = true)
-            @RequestBody ComplaintCreationDto dto,
+            @Valid @RequestBody ComplaintCreationDto dto,
             HttpServletRequest request);
 
     @Operation(summary = "Update a complaint", description = "Updates the content of an existing complaint")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Complaint updated successfully"),
-            @ApiResponse(responseCode = "404", description = "Complaint not found")
+            @ApiResponse(responseCode = "404", description = "Complaint not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data",
+                    content = @Content(mediaType = APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = Map.class)))
     })
     @PatchMapping("/{id}")
     ResponseEntity<Void> updateComplaint(
             @Parameter(description = "ID of the complaint to update") @PathVariable long id,
-            @Parameter(description = "Updated complaint information", required = true) @RequestBody ComplaintUpdateDto dto);
+            @Parameter(description = "Updated complaint information", required = true) @Valid @RequestBody ComplaintUpdateDto dto);
 }
