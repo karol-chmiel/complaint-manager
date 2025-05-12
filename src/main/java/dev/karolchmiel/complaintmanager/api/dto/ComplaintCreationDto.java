@@ -17,7 +17,7 @@ public record ComplaintCreationDto(
         String content,
 
         @NotBlank(message = "Complainant name is required")
-        @Size(max = 100, message = "Complainant name must be no more than 100 characters")
+        @Size(max = 50, message = "Complainant name must be no more than 50 characters")
         @Schema(description = "Name of the person making the complaint", example = "John Doe")
         String complainant
 ) {}
