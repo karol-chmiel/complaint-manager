@@ -10,7 +10,7 @@
     </parent>
     <groupId>dev.karolchmiel</groupId>
     <artifactId>complaint-manager</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0</version>
     <name>complaint-manager</name>
     <description>complaint-manager</description>
     <url/>
