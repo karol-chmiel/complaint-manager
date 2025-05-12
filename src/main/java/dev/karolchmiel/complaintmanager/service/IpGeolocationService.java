@@ -33,9 +33,16 @@ public class IpGeolocationService {
     public Optional<CountryCode> getCountryFromIp(String ipAddress) {
         try {
             final var url = buildApiUrl(ipApiUrl, ipAddress);
+            LOG.debug("Calling IP geolocation API with URL: {}", url);
+
             final var response = restTemplate.getForObject(url, IpApiResponse.class);
+            LOG.debug("Received response from IP geolocation API: {} for IP: {}", response, ipAddress);
+
             if (isValidResponse(response)) {
+                LOG.info("Successfully determined country {} from IP: {}", response.countryCode(), ipAddress);
                 return Optional.of(response.countryCode());
+            } else {
+                LOG.warn("Received invalid response from IP geolocation API for IP: {}", ipAddress);
             }
         } catch (Exception e) {
             LOG.error("Error getting country from IP: {}", ipAddress, e);

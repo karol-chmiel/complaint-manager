@@ -6,6 +6,8 @@ import dev.karolchmiel.complaintmanager.api.dto.ComplaintUpdateDto;
 import dev.karolchmiel.complaintmanager.mapper.ComplaintMapper;
 import dev.karolchmiel.complaintmanager.model.Complaint;
 import dev.karolchmiel.complaintmanager.repository.ComplaintRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +15,8 @@ import java.time.LocalDateTime;
 
 @Service
 public class ComplaintWriteService {
+    private static final Logger LOG = LoggerFactory.getLogger(ComplaintWriteService.class);
+
     private final ComplaintRepository complaintRepository;
     private final ComplaintMapper complaintMapper;
     private final IpGeolocationService ipGeolocationService;
@@ -37,11 +41,25 @@ public class ComplaintWriteService {
      */
     @Transactional
     public ComplaintRetrievalDto addNewOrIncrementCount(ComplaintCreationDto dto, String remoteAddr) {
-        final var complaint = complaintRepository
-                .findByProductIdAndComplainant(dto.productId(), dto.complainant())
-                .map(Complaint::incrementCount)
-                .orElseGet(() -> createNewComplaint(dto, remoteAddr));
+        LOG.info("Processing complaint for product ID: {} from complainant: {}", dto.productId(), dto.complainant());
+
+        final var existingComplaint = complaintRepository
+                .findByProductIdAndComplainant(dto.productId(), dto.complainant());
+
+        final var complaint = existingComplaint
+                .map(c -> {
+                    LOG.info("Found existing complaint with ID: {}, incrementing count", c.getId());
+                    return c.incrementCount();
+                })
+                .orElseGet(() -> {
+                    LOG.info("Creating new complaint for product ID: {} from complainant: {}",
+                            dto.productId(), dto.complainant());
+                    return createNewComplaint(dto, remoteAddr);
+                });
+
         final var savedComplaint = complaintRepository.save(complaint);
+        LOG.info("Saved complaint with ID: {}", savedComplaint.getId());
+
         return complaintMapper.entityToRetrievalDto(savedComplaint);
     }
 
@@ -54,8 +72,16 @@ public class ComplaintWriteService {
      */
     @Transactional
     public boolean updateComplaint(long complaintId, ComplaintUpdateDto dto) {
+        LOG.info("Updating content for complaint ID: {}", complaintId);
         final var rowsUpdated = complaintRepository.updateComplaintContent(complaintId, dto.content());
-        return rowsUpdated > 0;
+
+        if (rowsUpdated > 0) {
+            LOG.info("Successfully updated complaint ID: {}", complaintId);
+            return true;
+        } else {
+            LOG.warn("Failed to update complaint ID: {}, complaint not found", complaintId);
+            return false;
+        }
     }
 
     private Complaint createNewComplaint(ComplaintCreationDto dto, String remoteAddr) {

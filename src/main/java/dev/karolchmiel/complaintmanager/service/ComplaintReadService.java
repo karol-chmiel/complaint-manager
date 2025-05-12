@@ -3,6 +3,8 @@ package dev.karolchmiel.complaintmanager.service;
 import dev.karolchmiel.complaintmanager.api.dto.ComplaintRetrievalDto;
 import dev.karolchmiel.complaintmanager.mapper.ComplaintMapper;
 import dev.karolchmiel.complaintmanager.repository.ComplaintRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,6 +12,8 @@ import java.util.Optional;
 
 @Service
 public class ComplaintReadService {
+    private static final Logger LOG = LoggerFactory.getLogger(ComplaintReadService.class);
+
     private final ComplaintRepository complaintRepository;
     private final ComplaintMapper complaintMapper;
 
@@ -25,7 +29,11 @@ public class ComplaintReadService {
      * @return list of all complaints converted to DTOs
      */
     public List<ComplaintRetrievalDto> getAllComplaints() {
-        return complaintRepository.findAll().stream()
+        LOG.info("Retrieving all complaints");
+        final var complaints = complaintRepository.findAll();
+        LOG.debug("Found {} complaints in the database", complaints.size());
+
+        return complaints.stream()
                 .map(complaintMapper::entityToRetrievalDto)
                 .toList();
     }
@@ -37,7 +45,16 @@ public class ComplaintReadService {
      * @return the complaint if found, empty Optional otherwise
      */
     public Optional<ComplaintRetrievalDto> getComplaintById(long complaintId) {
-        return complaintRepository.findById(complaintId)
-                .map(complaintMapper::entityToRetrievalDto);
+        LOG.info("Retrieving complaint with ID: {}", complaintId);
+
+        final var complaint = complaintRepository.findById(complaintId);
+
+        if (complaint.isPresent()) {
+            LOG.debug("Found complaint with ID: {}", complaintId);
+            return complaint.map(complaintMapper::entityToRetrievalDto);
+        } else {
+            LOG.warn("Complaint with ID: {} not found", complaintId);
+            return Optional.empty();
+        }
     }
 }
